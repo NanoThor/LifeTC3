@@ -1,0 +1,10 @@
+// teste de classe
+/*
+Teste de Commnetário
+*/
+
+class Ander_10;
+
+/*
+Teste de Commnetário
+*/
