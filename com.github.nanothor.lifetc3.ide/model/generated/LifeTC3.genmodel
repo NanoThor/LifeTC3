@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/com.github.nanothor.lifetc3.ide/src-gen" editDirectory="/com.github.nanothor.lifetc3.ide.edit/src"
+    editorDirectory="/com.github.nanothor.lifetc3.ide.editor/src" modelPluginID="com.github.nanothor.lifetc3.ide"
+    forceOverwrite="true" modelName="LifeTC3" updateClasspath="false" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    complianceLevel="5.0" copyrightFields="false" editPluginID="com.github.nanothor.lifetc3.ide.edit"
+    editorPluginID="com.github.nanothor.lifetc3.ide.editor" runtimeVersion="2.10">
+  <genPackages prefix="LifeTC3" basePackage="com.github.nanothor.lifetc3.ide" disposableProviderFactory="true"
+      fileExtensions="lifetc3" ecorePackage="LifeTC3.ecore#/">
+    <genClasses ecoreClass="LifeTC3.ecore#//Prog">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute LifeTC3.ecore#//Prog/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference LifeTC3.ecore#//Prog/vc"/>
+    </genClasses>
+    <genClasses ecoreClass="LifeTC3.ecore#//Variable">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute LifeTC3.ecore#//Variable/names"/>
+    </genClasses>
+    <genClasses ecoreClass="LifeTC3.ecore#//Constant">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute LifeTC3.ecore#//Constant/name"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>
