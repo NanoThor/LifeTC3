@@ -38,7 +38,7 @@ type
 
 // definição de função
 function
-	: ID '(' (arg (',' arg)*)?')' ':' type  funcBlock;
+	: ID '(' (arg (',' arg)*)?')' ':' type  funcBody;
 
 // definiçao de parametro formal
 arg
@@ -47,28 +47,71 @@ arg
 
 // definição do bloco principal
 mainFunction
-	: 'main' funcBlock
+	: 'main' '(' ')' funcBody
 	;
 
 // corpo de função
-funcBlock
+funcBody
 	: '{' (variable|constant)* stmt* '}'
 	;
 
-
-stmt
-	: assign ';'
+// statement de retorno
+returnStmt
+	: 'return' '(' bool ')'
 	;
 
+// switch de statement
+stmt
+	: assign ';'
+	| functionCall ';'
+	| returnStmt ';'
+	| ifStmt
+	| forStmt
+	| whileStmt
+	| exitStmt ';'
+	;
+
+functionCall
+	: ID '(' (bool (',' bool)*)? ')'
+	;
+
+
+// statement exit (equivalente ao break do java, c, python e etc)
+exitStmt
+	: 'exit'
+	;
+
+// statement if
+ifStmt
+	: 'if' '(' bool ')' block ('else' block )?
+	;
+
+// statement for
+forStmt
+	: 'for' '(' ID '=' (ID|INT_LITERAL) ':' (ID|INT_LITERAL) ('step' INT_LITERAL)? ')' block
+	;
+
+// statement while
+whileStmt
+	: 'while' '(' bool ')' block
+	;
+
+// usado no if, for e while
+block
+	: '{' (stmt)* '}'
+	;
+
+// operação de atribuição
 assign
 	: ID '=' bool
 	;
-	
+
+// switch (em caso de adição dos operadores 'e' e 'ou' )
 bool
 	: relOp
 	;
 
-
+// operadores relacionais
 relOp
 	: eqOp '>' eqOp
 	| eqOp '>=' eqOp
@@ -77,6 +120,7 @@ relOp
 	| eqOp
 	;
 
+// operadores de igualdades (desigualdade)
 eqOp
 	: expr '==' expr
 	| expr '!=' expr
@@ -84,27 +128,32 @@ eqOp
 	| expr
 	;
 
+// adição e subtração
 expr
 	: expr '+' term
 	| expr '-' term
 	| term
 	;
 
+// multiplicação e divisão
 term
 	: term '*' unary
 	| term '/' unary
 	| unary
 	;
 
+// operadores unarios
 unary
 	: '!' unary
 	| '-' unary
 	| factor
 	;
 
+// fator
 factor
 	: '(' bool ')'
 	| ID
+	| functionCall
 	| literal
 	;
 
