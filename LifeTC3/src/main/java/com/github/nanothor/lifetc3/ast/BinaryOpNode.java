@@ -1,6 +1,11 @@
-package com.github.nanothor.lifetc3;
+package com.github.nanothor.lifetc3.ast;
 
-public class BinaryOpNode extends Node{
+/**
+ * Classe responsável por representa Operações binários na AST
+ * 
+ * @author Anderson
+ */
+public class BinaryOpNode extends Node {
     private BinaryOperation op;
     private Node left;
     private Node right;

@@ -1,30 +1,31 @@
 grammar LifeTC3Grammar;
 
-@passer::header {
-	import com.github.nanothor.lifetc3.*;
+@parser::header {
+	import com.github.nanothor.lifetc3.ast.*;
 }
 
 // regra inicial
 prog
-	: CLASS ID ';' (variable|constant)* function* mainFunction EOF
+	: CLASS ID ';' (varDecl|consDecl)* function* mainFunction EOF
 	;
 
 // switch para constantes literais
 literal
-	: INT_LITERAL
-	| FLOAT_LITERAL
-	| STRING_LITERAL
-	| TRUE
-	| FALSE
+returns [Node n]
+	: t=INT_LITERAL		{ $n = new ConstLiteralNode(Type.INT,     $t.getText()); }
+	| t=FLOAT_LITERAL	{ $n = new ConstLiteralNode(Type.FLOAT,   $t.getText()); }
+	| t=STRING_LITERAL	{ $n = new ConstLiteralNode(Type.STRING,  $t.getText()); }
+	| t=TRUE			{ $n = new ConstLiteralNode(Type.BOOLEAN, $t.getText()); }
+	| t=FALSE			{ $n = new ConstLiteralNode(Type.BOOLEAN, $t.getText()); }
 	;
 
 // declaração de variáveis
-variable
+varDecl
 	: VAR ID (',' ID)* ':' type ';'
 	;
 
 // declaração de constantes
-constant
+consDecl
 	: type ID '=' literal ';'
 	;
 
@@ -52,7 +53,7 @@ mainFunction
 
 // corpo de função
 funcBody
-	: '{' (variable|constant)* stmt* '}'
+	: '{' (varDecl|consDecl)* stmt* '}'
 	;
 
 // statement de retorno
@@ -108,53 +109,60 @@ assign
 
 // switch (em caso de adição dos operadores 'e' e 'ou' )
 bool
-	: relOp
+returns [Node n]
+	: u=relOp  { $n = $u.n; }
 	;
 
 // operadores relacionais
 relOp
-	: eqOp '>' eqOp
-	| eqOp '>=' eqOp
-	| eqOp '<' eqOp
-	| eqOp '<=' eqOp
-	| eqOp
+returns [Node n]
+	: l=eqOp '>'  r=eqOp { $n = new BinaryOpNode(BinaryOperation.GT , $l.n, $r.n); } 
+	| l=eqOp '>=' r=eqOp { $n = new BinaryOpNode(BinaryOperation.GTE, $l.n, $r.n); }
+	| l=eqOp '<'  r=eqOp { $n = new BinaryOpNode(BinaryOperation.LT , $l.n, $r.n); }
+	| l=eqOp '<=' r=eqOp { $n = new BinaryOpNode(BinaryOperation.LTE, $l.n, $r.n); }
+	| u=eqOp { $n = $u.n; }
 	;
 
 // operadores de igualdades (desigualdade)
 eqOp
-	: expr '==' expr
-	| expr '!=' expr
-	| expr '<>' expr
-	| expr
+returns [Node n]
+	: l=expr '==' r=expr { $n = new BinaryOpNode(BinaryOperation.EQ, $l.n, $r.n); }
+	| l=expr '!=' r=expr { $n = new BinaryOpNode(BinaryOperation.NE, $l.n, $r.n); }
+	| l=expr '<>' r=expr { $n = new BinaryOpNode(BinaryOperation.NE, $l.n, $r.n); }
+	| u=expr { $n = $u.n; }
 	;
 
 // adição e subtração
 expr
-	: expr '+' term
-	| expr '-' term
-	| term
+returns [Node n]
+	: l=expr '+' r=term { $n = new BinaryOpNode(BinaryOperation.ADD, $l.n, $r.n); }
+	| l=expr '-' r=term { $n = new BinaryOpNode(BinaryOperation.SUB, $l.n, $r.n); }
+	| u=term { $n = $u.n; }
 	;
 
 // multiplicação e divisão
 term
-	: term '*' unary
-	| term '/' unary
-	| unary
+returns [Node n]
+	: l=term '*' r=unary { $n = new BinaryOpNode(BinaryOperation.MUL, $l.n, $r.n); }
+	| l=term '/' r=unary { $n = new BinaryOpNode(BinaryOperation.DIV, $l.n, $r.n); }
+	| u=unary { $n = $u.n; }
 	;
 
 // operadores unarios
 unary
-	: '!' unary
-	| '-' unary
-	| factor
+returns [Node n]
+	: '!' unary	{ $n = new NotNode($unary.n); }
+	| '-' unary	{ $n = new MenusNode($unary.n); }
+	| factor	{ $n = $factor.n; }
 	;
 
 // fator
 factor
-	: '(' bool ')'
-	| ID
-	| functionCall
-	| literal
+returns [Node n]
+	: '(' bool ')'	{ $n = null; }
+	| ID			{ $n = null; }
+	| functionCall	{ $n = null; }
+	| literal		{ $n = $literal.n; }
 	;
 
 // tipos

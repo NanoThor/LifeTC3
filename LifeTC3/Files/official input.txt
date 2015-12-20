@@ -1,0 +1,21 @@
+class exemplo;
+var numero : int;
+
+fatorial (int fat) : int{
+	if (fat > 1) {
+		return (fat * fatorial(fat - 1) );
+ 	} else {
+		return (1);
+ 	}
+ }
+ 
+resultado (int valor) : boolean {
+	print ("Resultado: ", valor);
+	return (TRUE);
+}
+
+main() {
+	print ("Fatorial de N. Digite o número?");
+	read (numero);
+	resultado (fatorial(numero)) ;
+}
