@@ -6,12 +6,13 @@ package com.github.nanothor.lifetc3.ast;
  * @author Anderson
  * 
  */
+// no da ast para menos unario
 public class MenusNode extends Node {
     private Node n;
 
     public MenusNode(Node n) {
         this.n = n;
-        System.out.println("MenusNode.MenusNode()");
+        // System.out.println(this);
     }
 
     public Node getN() {
@@ -20,6 +21,11 @@ public class MenusNode extends Node {
 
     public void setN(Node n) {
         this.n = n;
+    }
+
+    @Override
+    public String toString() {
+        return "MenusNode [n=" + n + "]";
     }
 
 }

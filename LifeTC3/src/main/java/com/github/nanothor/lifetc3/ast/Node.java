@@ -5,8 +5,8 @@ package com.github.nanothor.lifetc3.ast;
  * 
  * @author Anderson
  */
+//no generico da ast
 public class Node {
     public Node() {
-        System.out.println(this.getClass().getCanonicalName());
     }
 }

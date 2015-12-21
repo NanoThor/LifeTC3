@@ -12,8 +12,8 @@ public class ConstLiteralNode extends Node {
     public ConstLiteralNode(Type type, String value) {
         this.type = type;
         this.value = value;
-        
-        System.out.printf("ConstLiteralNode(%s, %s)\n", type, value);
+
+        // System.out.println(this);
     }
 
     public Type getType() {
@@ -30,5 +30,10 @@ public class ConstLiteralNode extends Node {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "ConstLiteralNode [type=" + type + ", value=" + value + "]";
     }
 }

@@ -10,6 +10,8 @@ public class NotNode extends Node {
 
     public NotNode(Node n) {
         this.setN(n);
+
+        // System.out.println(this);
     }
 
     public Node getN() {
@@ -19,4 +21,10 @@ public class NotNode extends Node {
     public void setN(Node n) {
         this.n = n;
     }
+
+    @Override
+    public String toString() {
+        return "NotNode [n=" + n + "]";
+    }
+
 }

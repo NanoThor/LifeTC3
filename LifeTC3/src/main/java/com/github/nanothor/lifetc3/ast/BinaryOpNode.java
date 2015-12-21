@@ -39,4 +39,11 @@ public class BinaryOpNode extends Node {
     public void setRight(Node right) {
         this.right = right;
     }
+
+    @Override
+    public String toString() {
+        return "BinaryOpNode [op=" + op + ", left=" + left + ", right=" + right
+                + "]";
+    }
+
 }
