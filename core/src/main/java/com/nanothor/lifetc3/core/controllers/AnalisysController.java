@@ -1,0 +1,71 @@
+package com.nanothor.lifetc3.core.controllers;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.gui.TreeViewer;
+
+import br.ufpi.compilers.firstcompiler.antlr4.Grammar01Lexer;
+import br.ufpi.compilers.firstcompiler.antlr4.Grammar01Parser;
+import br.ufpi.compilers.firstcompiler.antlr4.LifeTC3GrammarLexer;
+import br.ufpi.compilers.firstcompiler.antlr4.LifeTC3GrammarParser;
+
+public class AnalisysController {
+	private static AnalisysController _instance = null;
+	private LifeTC3GrammarLexer _lexer;
+	private CommonTokenStream _tokens;
+	private LifeTC3GrammarParser _parser;
+	
+	public static AnalisysController getInstance(){
+		if(_instance==null){
+			_instance = new AnalisysController();
+			return _instance;
+		}
+		return _instance;
+	}
+	
+	protected AnalisysController() {
+		_lexer = new LifeTC3GrammarLexer(null);
+		_tokens = new CommonTokenStream(_lexer);
+		_parser = new LifeTC3GrammarParser(_tokens);
+	}
+	
+	/**
+	 * Set text as input stream to lexer.
+	 * @param text
+	 */
+	public void setTextInput(String text){
+		ANTLRInputStream input;
+		try {
+			input = new ANTLRInputStream(new BufferedReader(new StringReader(text)));
+			_lexer.setInputStream(input);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public TreeViewer getCompleteParserTreeViewer(){
+		ArrayList<String> ruleList = new ArrayList<String>();
+		for(String ruleName : _parser.getRuleNames()){
+			ruleList.add(ruleName);
+		}
+		return new TreeViewer(ruleList, _parser.prog());
+	}
+	
+	public TreeViewer getCompleteParserTreeViewer(String text){
+		setTextInput(text);
+		_tokens = new CommonTokenStream(_lexer);
+		_parser = new LifeTC3GrammarParser(_tokens);
+		return getCompleteParserTreeViewer();
+	}
+	
+	public LifeTC3GrammarParser getParser() {
+		return _parser;
+	}
+	
+}
