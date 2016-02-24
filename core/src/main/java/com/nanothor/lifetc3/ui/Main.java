@@ -15,16 +15,17 @@ import javax.swing.JTabbedPane;
 
 import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.jdesktop.swingx.JXMultiSplitPane;
 import org.jdesktop.swingx.multisplitpane.DefaultSplitPaneModel;
 
 import com.nanothor.lifetc3.core.controllers.AnalisysController;
+import com.nanothor.lifetc3.ui.utils.ANTLRTokenMaker;
 
 public class Main {
 
+	protected static final boolean debug = true;
 	private JFrame frame;
 	private JPanel lower_panel;
 	private AnalisysController analisysController;
@@ -116,17 +117,19 @@ public class Main {
 		textArea = new RSyntaxTextArea(20, 60);
 		textArea.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyTyped(KeyEvent arg0) {
+			public void keyReleased(KeyEvent event) {
+				super.keyReleased(event);
+				if (debug) {
+					System.out.println("Tecla: " + event.getKeyChar());
+					System.out.println(textArea.getText());
+				}
 				updateTreeView();
 			}
 		});
 
-		AbstractTokenMakerFactory tFactory = (AbstractTokenMakerFactory) TokenMakerFactory
-				.getDefaultInstance();
-		tFactory.putMapping("Demo",
-				"com.nanothor.lifetc3.ui.utils.ANTLRTokenMaker");
+		AbstractTokenMakerFactory tFactory = (AbstractTokenMakerFactory) TokenMakerFactory.getDefaultInstance();
+		tFactory.putMapping("Demo", ANTLRTokenMaker.class.getCanonicalName());
 		TokenMakerFactory.setDefaultInstance(tFactory);
-//		textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 
 		textArea.setSyntaxEditingStyle("Demo");
 		textArea.setCloseCurlyBraces(true);
@@ -137,20 +140,22 @@ public class Main {
 		JPanel tree_panel = new JPanel();
 		center_panel.setLayout(new BorderLayout(0, 0));
 		tree_panel.setLayout(new BorderLayout(0, 0));
-		
-		treeViewerPanel = new TreeViewerPanel(analisysController.getInstance().getCompleteParserTreeViewer(textArea.getText()));
-		
+
+		treeViewerPanel = new TreeViewerPanel(
+				AnalisysController.getInstance().getCompleteParserTreeViewer(textArea.getText()));
+
 		tree_panel.add(treeViewerPanel);
 
-		JSplitPane splitPane_1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-				sp, tree_panel);
+		JSplitPane splitPane_1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sp, tree_panel);
 		center_panel.add(splitPane_1);
-		
+
 	}
-	
-	private void updateTreeView(){
-		System.out.println("KeyTyped");
-		System.out.println(textArea.getText());
+
+	private void updateTreeView() {
+		if (debug) {
+			System.out.println("KeyTyped");
+			System.out.println(textArea.getText());
+		}
 		AnalisysController analisysController = AnalisysController.getInstance();
 		try {
 			treeViewerPanel.updateTree(analisysController.getCompleteParserTreeViewer(textArea.getText()));
@@ -158,5 +163,5 @@ public class Main {
 			System.out.println(e);
 		}
 	}
-	
+
 }

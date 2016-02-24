@@ -1,7 +1,6 @@
-grammar AnalisysGrammar;
+lexer grammar AnalisysGrammar;
 
 //entry: (RESERVED_WORD | IDENTIFIER | WHITESPACE | LITERAL_INT | LITERAL_FLOAT | LITERAL_CHAR | PARENS | BLOCK | OPERATORS)*;
-entry: ;
 //======================================
 // TOKENS ==============================
 //======================================
@@ -158,7 +157,8 @@ RPARENS: ')';
 ID: CHAR (NUMBER | CHAR)*;
 NUMBER: [0-9]+;
 CHAR: [a-zA-Z]+;
-ANYCHAR: .;
 EOL: ';';
 //INVALID: .;
 WS  : [ \t\n\r];
+// para não ter confusão com outras regras
+ANYCHAR: .;
