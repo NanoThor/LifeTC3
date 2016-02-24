@@ -5,8 +5,16 @@ package com.github.nanothor.lifetc3.ast;
  * 
  * @author Anderson
  */
-//no generico da ast
+// no generico da ast
 public class Node {
-    public Node() {
-    }
+	String name;
+	protected Type type;
+
+	public Node() {
+		name = getClass().getName();
+	}
+
+	public Type getType() {
+		return type;
+	}
 }

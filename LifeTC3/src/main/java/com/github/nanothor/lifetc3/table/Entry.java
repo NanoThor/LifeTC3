@@ -3,7 +3,7 @@ package com.github.nanothor.lifetc3.table;
 // entrada na tabela de simbolos 
 public class Entry {
     public enum EntryType {
-        VAR, CONST, CLASS, FUNCTION
+        VAR, CONST, CLASS, FUNCTION, ARG
     }
     private String id;
     private Info info;

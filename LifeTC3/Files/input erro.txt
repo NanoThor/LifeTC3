@@ -1,7 +1,7 @@
 class exemplo;
 var numero : int;
 
-fatorial (int fat) : int {
+fatorial (int fat) : int{
 	if (fat > 1) {
 		return (fat * fatorial(fat - 1) );
  	} else {
@@ -17,5 +17,5 @@ resultado (int valor) : boolean {
 main() {
 	print ("Fatorial de N. Digite o número?");
 	read (numero);
-	resultado (fatorial(numero)) ;
+	resultado (fatorial(numero) , ) ;
 }

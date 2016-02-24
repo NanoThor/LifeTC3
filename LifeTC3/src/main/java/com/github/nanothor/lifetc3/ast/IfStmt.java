@@ -1,18 +1,15 @@
 package com.github.nanothor.lifetc3.ast;
 
-import java.util.List;
-
 //no da ast para comando if
 public class IfStmt extends Node {
     // para a condição
     private Node condition;
     // para o then
-    private List<Node> then;
+    private Node then;
     // para o else
-    private List<Node> elze;
+    private Node elze;
 
-    public IfStmt(Node condition, List<Node> then, List<Node> elze) {
-        super();
+    public IfStmt(Node condition, Node then, Node elze) {
         this.condition = condition;
         this.then = then;
         this.elze = elze;

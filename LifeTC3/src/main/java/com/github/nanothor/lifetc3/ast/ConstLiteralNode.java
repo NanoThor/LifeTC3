@@ -6,14 +6,11 @@ package com.github.nanothor.lifetc3.ast;
  * @author Anderson
  */
 public class ConstLiteralNode extends Node {
-    private Type type;
     private String value;
 
     public ConstLiteralNode(Type type, String value) {
         this.type = type;
         this.value = value;
-
-        // System.out.println(this);
     }
 
     public Type getType() {
@@ -30,10 +27,5 @@ public class ConstLiteralNode extends Node {
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return "ConstLiteralNode [type=" + type + ", value=" + value + "]";
     }
 }

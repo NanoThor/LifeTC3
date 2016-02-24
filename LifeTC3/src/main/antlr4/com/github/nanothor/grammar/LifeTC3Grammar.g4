@@ -1,26 +1,34 @@
 grammar LifeTC3Grammar;
 
-@parser::header 
+@parser::header
 {
 	import com.github.nanothor.lifetc3.ast.Node;
 	import com.github.nanothor.lifetc3.ast.Type;
-	import java.util.List;
 }
 
 // regra inicial
 prog
 returns [Node n]
-	: CLASS name=ID ';' (varDecl|constDecl)* funcDecl* mainFunction EOF
+	: classHead classBody EOF
+	;
+
+classHead
+	: CLASS name=ID ';'
+	;
+
+classBody
+returns [Node n]
+	: (varDecl|constDecl)* funcDecl* mainFunction
 	;
 
 // switch para constantes literais
 literal
 returns [Node n]
-	: l=INT_LITERAL
-	| l=FLOAT_LITERAL
-	| l=STRING_LITERAL
-	| l=TRUE
-	| l=FALSE
+	: INT_LITERAL         # IntLiteralL
+	| FLOAT_LITERAL       # FloatLiteralL
+	| STRING_LITERAL      # StringLiteralL
+	| v=TRUE              # BoolLiteralL
+	| v=FALSE             # BoolLiteralL
 	;
 
 // declaração de variáveis
@@ -36,10 +44,10 @@ constDecl
 // switch para tipos
 type
 returns [Type t]
-	: STRING
-	| INT
-	| FLOAT
-	| BOOL
+	: STRING        # StringL
+	| INT           # IntL
+	| FLOAT         # FloatL
+	| BOOL          # BoolL
 	;
 
 // definição de função
@@ -61,26 +69,26 @@ returns [Node n]
 
 // corpo de função
 funcBody
-returns [List<Node> ns]
+returns [Node n]
 	: '{' (varDecl|constDecl)* stmt* '}'
 	;
 
 // statement de retorno
 returnStmt
 returns [Node n]
-	: 'return' '(' bool ')'
+	: 'return' '(' ret=bool ')'
 	;
 
 // switch de statement
 stmt
 returns [Node n]
-	: assign ';'
-	| functionCall ';'
-	| returnStmt ';'
-	| ifStmt
-	| forStmt
-	| whileStmt
-	| exitStmt ';'
+	: assign ';'          # FromAssignToStmtL
+	| functionCall ';'    # FromFunctionCallToStmtL
+	| returnStmt ';'      # FromReturnStmtToStmtL
+	| ifStmt              # FromIfStmtToStmtL
+	| forStmt             # FromForStmtToStmtL
+	| whileStmt           # FromWhileStmtToStmtL
+	| exitStmt ';'        # FromExitStmtToStmtL
 	;
 
 functionCall
@@ -115,7 +123,7 @@ returns [Node n]
 
 // usado no if, for e while
 block
-returns [List<Node> ns]
+returns [Node n]
 	: '{' (stmt)* '}'
 	;
 
@@ -134,53 +142,53 @@ returns [Node n]
 // operadores relacionais
 relOp
 returns [Node n]
-	: l=eqOp op='>'  r=eqOp
-	| l=eqOp op='>=' r=eqOp
-	| l=eqOp op='<'  r=eqOp
-	| l=eqOp op='<=' r=eqOp
-	| l=eqOp
+	: l=eqOp op='>'  r=eqOp # GtOperationL
+	| l=eqOp op='>=' r=eqOp # GeOperationL
+	| l=eqOp op='<'  r=eqOp # LtOperationL
+	| l=eqOp op='<=' r=eqOp # LeOperationL
+	| eqOp                # FromEqOpToRelOpL
 	;
 
 // operadores de igualdades (desigualdade)
 eqOp
 returns [Node n]
-	: l=expr op='==' r=expr
-	| l=expr op='!=' r=expr
-	| l=expr op='<>' r=expr
-	| l=expr
+	: l=expr op='==' r=expr # EqOperationL
+	| l=expr op='!=' r=expr # DiffOperationL
+	| l=expr op='<>' r=expr # DiffOperationL
+	| l=expr                # FromExprToEqOpL
 	;
 
 // adição e subtração
 expr
 returns [Node n]
-	: l=expr op='+' r=term
-	| l=expr op='-' r=term
-	| u=term
+	: l=expr op='+' r=term  # AddOperationL
+	| l=expr op='-' r=term  # SubOperationL
+	| u=term                # FromTermToExprL
 	;
 
 // multiplicação e divisão
 term
 returns [Node n]
-	: l=term op='*' r=unary
-	| l=term op='/' r=unary
-	| u=unary
+	: l=term op='*' r=unary   # MulOperationL
+	| l=term op='/' r=unary   # DivOperationL
+	| u=unary                 # FromUnaryToTermL
 	;
 
 // operadores unarios
 unary
 returns [Node n]
-	: op='!' r=unary
-	| op='-' r=unary
-	| u=factor
+	: op='!' r=unary  # NotOperationL
+	| op='-' r=unary  # MinusOperationL
+	| u=factor        # FromFactorToUnaryL
 	;
 
 // fator
 factor
 returns [Node n]
-	: '(' bool ')'
-	| ID
-	| functionCall
-	| literal
+	: '(' bool ')'    # FromBoolToFactorL
+	| ID              # VarConstUseL
+	| functionCall    # FunctionCallL
+	| literal         # LiteralL
 	;
 
 // tipos

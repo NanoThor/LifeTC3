@@ -1,0 +1,15 @@
+library lib;
+
+And (Boolean a, Boolean b) : Boolean {
+    if( a == False) {
+        return (False);
+    }
+    if( b == False) {
+        return (False);
+    }
+    return (True);
+}
+
+Or (Boolean a, Boolean b) : Boolean {
+    return ( and( !a, !b) );
+}
