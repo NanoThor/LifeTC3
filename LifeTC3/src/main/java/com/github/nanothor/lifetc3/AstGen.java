@@ -133,16 +133,19 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void enterProg(ProgContext ctx) {
+		tableKeyAccessor.push(Table.newId());
 	}
 
 	@Override
 	public void exitProg(ProgContext ctx) {
 		ctx.n = ctx.classBody().n;
+		tableKeyAccessor.pop();
 	}
 
 	@Override
 	public void enterClassHead(ClassHeadContext ctx) {
-		// TODO Adicionar id da classe a tabela de simbolos.
+		String classId = ctx.name.getText();
+		Table.put(classId, new Entry(classId, EntryType.CLASS, null), tableKeyAccessor.peek());
 	}
 
 	@Override
