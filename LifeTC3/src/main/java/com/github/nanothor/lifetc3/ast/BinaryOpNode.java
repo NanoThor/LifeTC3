@@ -53,10 +53,33 @@ public class BinaryOpNode extends Node {
 	public void visit(PrintStream ps) {
 		left.visit(ps);
 		right.visit(ps);
-
-		String l1;
-		String l2;
-
-		ps.println("TODO");
+		
+		switch (op) {
+		case ADD:
+			ps.println(getTypedOperation("add", left.getType()));
+			break;
+		case SUB:
+			ps.println(getTypedOperation("sub", left.getType()));
+			break;
+		case MUL:
+			ps.println(getTypedOperation("mul", left.getType()));
+			break;
+		case DIV:
+			ps.println(getTypedOperation("div", left.getType()));
+			break;
+		default:
+			throw new RuntimeException("Erro Interno. Operação não reconhecida.");
+		}
+	}
+	
+	public String getTypedOperation(String sufix, Type type){
+		switch (type) {
+		case INT:
+			return "i" + sufix;  
+		case FLOAT:
+			return "f" + sufix;
+		default:
+			throw new RuntimeException("Erro Interno. Tipo não definido.");
+		}
 	}
 }
