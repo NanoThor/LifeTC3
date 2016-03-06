@@ -13,6 +13,7 @@ returns [Node n]
 	;
 
 classHead
+returns [com.github.nanothor.lifetc3.table.ClassInfo classInfo]
 	: CLASS name=ID ';'
 	;
 
@@ -56,6 +57,7 @@ returns [Node n]
 	: funcHead  funcBody;
 
 funcHead
+returns [com.github.nanothor.lifetc3.table.FuncInfo info]
     : name=ID '(' (arg (',' arg)*)?')' ':' type
     ;
 

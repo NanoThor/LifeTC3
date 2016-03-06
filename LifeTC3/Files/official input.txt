@@ -2,6 +2,9 @@ class exemplo;
 var numero : int;
 
 fatorial (int fat) : int {
+	var k : int;
+	numero = 10;
+	k = 20;
 	if (fat > 1) {
 		return (fat * fatorial(fat - 1) );
  	} else {

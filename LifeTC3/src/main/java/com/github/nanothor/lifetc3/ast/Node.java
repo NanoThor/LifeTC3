@@ -1,6 +1,7 @@
 package com.github.nanothor.lifetc3.ast;
 
 import java.io.PrintStream;
+import java.util.LinkedList;
 
 /**
  * Classe responsável por representar o No da arvore
@@ -9,6 +10,8 @@ import java.io.PrintStream;
  */
 // no generico da ast
 public abstract class Node {
+	protected static LinkedList<Integer> scopeAccessor;
+
 	String name;
 	protected Type type;
 	protected String retAddr;

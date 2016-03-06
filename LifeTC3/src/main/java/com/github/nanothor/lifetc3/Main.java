@@ -9,11 +9,8 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import com.github.nanothor.grammar.LifeTC3GrammarLexer;
 import com.github.nanothor.grammar.LifeTC3GrammarParser;
 import com.github.nanothor.grammar.LifeTC3GrammarParser.ProgContext;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
-public class Tree {
+public class Main {
 	public static void main(String[] args) throws Exception {
 		ANTLRInputStream is;
 		if (args.length > 0) {
@@ -30,9 +27,12 @@ public class Tree {
 		ParseTree tree = p.prog();
 		walker.walk(astGen, tree);
 
-		Gson gson = new GsonBuilder().setPrettyPrinting().setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)
-				.serializeNulls().create();
+		((ProgContext) tree).n.visit(System.out);
 
-		gson.toJson(((ProgContext) tree).n, System.out);
+		// Gson gson = new
+		// GsonBuilder().setPrettyPrinting().setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)
+		// .serializeNulls().create();
+		//
+		// gson.toJson(((ProgContext) tree).n, System.out);
 	}
 }

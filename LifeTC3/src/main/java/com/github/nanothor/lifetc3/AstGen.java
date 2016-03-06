@@ -71,10 +71,12 @@ import com.github.nanothor.grammar.LifeTC3GrammarParser.WhileStmtContext;
 import com.github.nanothor.lifetc3.ast.AssignStmt;
 import com.github.nanothor.lifetc3.ast.BinaryOpNode;
 import com.github.nanothor.lifetc3.ast.BinaryOperation;
+import com.github.nanothor.lifetc3.ast.ClassNode;
 import com.github.nanothor.lifetc3.ast.ConstLiteralNode;
 import com.github.nanothor.lifetc3.ast.ConstNode;
 import com.github.nanothor.lifetc3.ast.ExitStmt;
 import com.github.nanothor.lifetc3.ast.ForStmt;
+import com.github.nanothor.lifetc3.ast.FuncNode;
 import com.github.nanothor.lifetc3.ast.IfStmt;
 import com.github.nanothor.lifetc3.ast.MenusNode;
 import com.github.nanothor.lifetc3.ast.Node;
@@ -86,6 +88,7 @@ import com.github.nanothor.lifetc3.ast.VarNode;
 import com.github.nanothor.lifetc3.ast.WhileStmt;
 import com.github.nanothor.lifetc3.table.ArgInfo;
 import com.github.nanothor.lifetc3.table.BuiltIn;
+import com.github.nanothor.lifetc3.table.ClassInfo;
 import com.github.nanothor.lifetc3.table.ConstInfo;
 import com.github.nanothor.lifetc3.table.Entry;
 import com.github.nanothor.lifetc3.table.Entry.EntryType;
@@ -142,13 +145,26 @@ public class AstGen implements LifeTC3GrammarListener {
 	@Override
 	public void exitProg(ProgContext ctx) {
 		ctx.n = ctx.classBody().n;
+		ClassInfo info = ctx.classHead().classInfo;
+		info.setScopeAccessor(tableKeyAccessor);
+		((ClassNode) ctx.n).setClassInfo(info);
 		tableKeyAccessor.pop();
 	}
 
 	@Override
 	public void enterClassHead(ClassHeadContext ctx) {
+		// obtem o nome da classe
 		String classId = ctx.name.getText();
-		Table.put(classId, new Entry(classId, EntryType.CLASS, null), tableKeyAccessor.peek());
+
+		// criação do objeto que guarda dados da classe;
+		ClassInfo info = new ClassInfo(classId);
+		info.setScopeAccessor(tableKeyAccessor);
+
+		// necessário ao no ClassNode da AST
+		ctx.classInfo = info;
+
+		// coloca o nome na tabela de simbolos
+		Table.put(classId, new Entry(classId, EntryType.CLASS, info), tableKeyAccessor.get(1));
 	}
 
 	@Override
@@ -166,7 +182,7 @@ public class AstGen implements LifeTC3GrammarListener {
 		// questẽs de escopo
 		scope.pop();
 
-		SeqNode seq = new SeqNode();
+		ClassNode seq = new ClassNode();
 		ctx.funcDecl().forEach(x -> seq.add(x.n));
 		seq.add(ctx.mainFunction().n);
 		ctx.n = seq;
@@ -256,9 +272,16 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitFuncDecl(FuncDeclContext ctx) {
+		// Questões de Escopo
 		tableKeyAccessor.pop();
 		scope.pop();
+
+		// repassa o nó para cima
 		ctx.n = ctx.funcBody().n;
+
+		// informação de necessário ao nó FuncNode;
+		FuncInfo info = ctx.funcHead().info;
+		((FuncNode) ctx.n).setInfo(info);
 	}
 
 	@Override
@@ -290,6 +313,10 @@ public class AstGen implements LifeTC3GrammarListener {
 	public void exitMainFunction(MainFunctionContext ctx) {
 		tableKeyAccessor.pop();
 		ctx.n = ctx.funcBody().n;
+
+		FuncInfo info = new FuncInfo("main", new ArrayList<>());
+		info.setScopeAccessor(tableKeyAccessor);
+		((FuncNode) ctx.n).setInfo(info);
 	}
 
 	@Override
@@ -298,7 +325,7 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitFuncBody(FuncBodyContext ctx) {
-		SeqNode seq = new SeqNode();
+		FuncNode seq = new FuncNode();
 		for (StmtContext stmt : ctx.stmt()) {
 			seq.add(stmt.n);
 		}
@@ -741,6 +768,7 @@ public class AstGen implements LifeTC3GrammarListener {
 		// nome da função
 		String name = ctx.name.getText();
 
+		// verificação de erro!
 		// verificar se a função existe
 		Entry entry = Table.get(name, tableKeyAccessor);
 		if (entry != null && entry.getType() != EntryType.FUNCTION)
@@ -758,6 +786,7 @@ public class AstGen implements LifeTC3GrammarListener {
 
 		// lista de parametros
 		List<Pair<Type, String>> args = new ArrayList<>();
+
 		// quantidade de parametros default
 		Integer qtParamDefault = 0;
 
@@ -769,8 +798,10 @@ public class AstGen implements LifeTC3GrammarListener {
 		}
 
 		// conjunto de informações sobre a função
-		FuncInfo info = new FuncInfo(args);
+		FuncInfo info = new FuncInfo(name, args);
 		qtParamDefault = info.getQtParamDefault();
+		info.setScopeAccessor(tableKeyAccessor);
+		ctx.info = info;
 
 		// para cada possível representção de função (parametros default)
 		// cria um marcador e coloca na tabela.

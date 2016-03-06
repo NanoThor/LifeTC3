@@ -15,6 +15,8 @@ public class SeqNode extends Node {
 
 	@Override
 	public void visit(PrintStream ps) {
-		ps.println("TODO");
+		for (Node n : seq) {
+			n.visit(ps);
+		}
 	}
 }

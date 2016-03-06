@@ -26,6 +26,19 @@ public class IfStmt extends Node {
 
 	@Override
 	public void visit(PrintStream ps) {
-		ps.println("TODO");
+		System.out.println("TODO IF");
+		switch (condition.type) {
+		case STRING:
+			System.out.println("Fazer condição quando for String");
+			break;
+		case BOOLEAN:
+		case INT:
+			break;
+
+		case FLOAT:
+			break;
+		default:
+			break;
+		}
 	}
 }
