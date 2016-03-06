@@ -1,8 +1,6 @@
 package com.github.nanothor.lifetc3.ast;
 
-import java.util.List;
-
-import com.github.nanothor.lifetc3.codegen.ThreeAddrCode;
+import java.io.PrintStream;
 
 /**
  * Classe responsável por representar o No da arvore
@@ -14,7 +12,7 @@ public abstract class Node {
 	String name;
 	protected Type type;
 	protected String retAddr;
-	
+
 	static long counter = 0;
 
 	public Node() {
@@ -27,5 +25,5 @@ public abstract class Node {
 		return type;
 	}
 
-	public abstract List<ThreeAddrCode> visit();	
+	public abstract void visit(PrintStream ps);
 }

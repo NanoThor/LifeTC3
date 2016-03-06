@@ -1,5 +1,7 @@
 package com.github.nanothor.lifetc3.ast;
 
+import java.io.PrintStream;
+
 //no da ast para o comando for
 public class ForStmt extends Node {
 	String var;
@@ -20,5 +22,10 @@ public class ForStmt extends Node {
 	@Override
 	public String toString() {
 		return "ForStmt [var=" + var + ", ini=" + ini + ", fin=" + fin + ", cmds=" + cmds + "]";
+	}
+
+	@Override
+	public void visit(PrintStream ps) {
+		ps.println("TODO");
 	}
 }

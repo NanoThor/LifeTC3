@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
@@ -144,7 +145,7 @@ public class Main {
 		treeViewerPanel = new TreeViewerPanel(
 				AnalisysController.getInstance().getCompleteParserTreeViewer(textArea.getText()));
 
-		tree_panel.add(treeViewerPanel);
+		tree_panel.add(new JScrollPane(treeViewerPanel));
 
 		JSplitPane splitPane_1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sp, tree_panel);
 		center_panel.add(splitPane_1);

@@ -1,5 +1,6 @@
 package com.github.nanothor.lifetc3.ast;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,5 +11,10 @@ public class SeqNode extends Node {
 		if (seq == null)
 			seq = new ArrayList<>();
 		seq.add(n);
+	}
+
+	@Override
+	public void visit(PrintStream ps) {
+		ps.println("TODO");
 	}
 }

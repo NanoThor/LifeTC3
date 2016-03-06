@@ -1,5 +1,7 @@
 package com.github.nanothor.lifetc3.ast;
 
+import java.io.PrintStream;
+
 /**
  * Representa a operação menos unario na AST
  * 
@@ -8,24 +10,28 @@ package com.github.nanothor.lifetc3.ast;
  */
 // no da ast para menos unario
 public class MenusNode extends Node {
-    private Node n;
+	private Node n;
 
-    public MenusNode(Node n) {
-        this.n = n;
-        // System.out.println(this);
-    }
+	public MenusNode(Node n) {
+		this.n = n;
+		// System.out.println(this);
+	}
 
-    public Node getN() {
-        return n;
-    }
+	public Node getN() {
+		return n;
+	}
 
-    public void setN(Node n) {
-        this.n = n;
-    }
+	public void setN(Node n) {
+		this.n = n;
+	}
 
-    @Override
-    public String toString() {
-        return "MenusNode [n=" + n + "]";
-    }
+	@Override
+	public String toString() {
+		return "MenusNode [n=" + n + "]";
+	}
 
+	@Override
+	public void visit(PrintStream ps) {
+		ps.println("TODO");
+	}
 }

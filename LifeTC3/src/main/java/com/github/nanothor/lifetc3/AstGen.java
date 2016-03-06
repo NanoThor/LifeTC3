@@ -1,6 +1,8 @@
 package com.github.nanothor.lifetc3;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -41,6 +43,7 @@ import com.github.nanothor.grammar.LifeTC3GrammarParser.FromUnaryToTermLContext;
 import com.github.nanothor.grammar.LifeTC3GrammarParser.FromWhileStmtToStmtLContext;
 import com.github.nanothor.grammar.LifeTC3GrammarParser.FuncBodyContext;
 import com.github.nanothor.grammar.LifeTC3GrammarParser.FuncDeclContext;
+import com.github.nanothor.grammar.LifeTC3GrammarParser.FuncHeadContext;
 import com.github.nanothor.grammar.LifeTC3GrammarParser.FunctionCallContext;
 import com.github.nanothor.grammar.LifeTC3GrammarParser.FunctionCallLContext;
 import com.github.nanothor.grammar.LifeTC3GrammarParser.GeOperationLContext;
@@ -87,10 +90,10 @@ import com.github.nanothor.lifetc3.table.ConstInfo;
 import com.github.nanothor.lifetc3.table.Entry;
 import com.github.nanothor.lifetc3.table.Entry.EntryType;
 import com.github.nanothor.lifetc3.table.FuncInfo;
-import com.github.nanothor.lifetc3.table.Info;
 import com.github.nanothor.lifetc3.table.Scope;
 import com.github.nanothor.lifetc3.table.Table;
 import com.github.nanothor.lifetc3.table.VarInfo;
+import com.github.nanothor.lifetc3.util.Pair;
 
 public class AstGen implements LifeTC3GrammarListener {
 	private boolean debug = false;
@@ -246,9 +249,7 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void enterFuncDecl(FuncDeclContext ctx) {
-		Info info = new FuncInfo();
-		String name = ctx.name.getText();
-		Table.put(ctx.name.getText(), new Entry(name, EntryType.FUNCTION, info), tableKeyAccessor.peek());
+
 		tableKeyAccessor.push(Table.newId());
 		scope.push(Scope.LOCAL);
 	}
@@ -701,38 +702,106 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void enterStringL(StringLContext ctx) {
-	}
-
-	@Override
-	public void exitStringL(StringLContext ctx) {
 		ctx.t = Type.STRING;
 	}
 
 	@Override
-	public void enterIntL(IntLContext ctx) {
+	public void exitStringL(StringLContext ctx) {
 	}
 
 	@Override
-	public void exitIntL(IntLContext ctx) {
+	public void enterIntL(IntLContext ctx) {
 		ctx.t = Type.INT;
 	}
 
 	@Override
-	public void enterFloatL(FloatLContext ctx) {
+	public void exitIntL(IntLContext ctx) {
 	}
 
 	@Override
-	public void exitFloatL(FloatLContext ctx) {
+	public void enterFloatL(FloatLContext ctx) {
 		ctx.t = Type.FLOAT;
 	}
 
 	@Override
+	public void exitFloatL(FloatLContext ctx) {
+	}
+
+	@Override
 	public void enterBoolL(BoolLContext ctx) {
+		ctx.t = Type.BOOLEAN;
 	}
 
 	@Override
 	public void exitBoolL(BoolLContext ctx) {
-		ctx.t = Type.BOOLEAN;
+	}
+
+	@Override
+	public void enterFuncHead(FuncHeadContext ctx) {
+		// nome da função
+		String name = ctx.name.getText();
+
+		// verificar se a função existe
+		Entry entry = Table.get(name, tableKeyAccessor);
+		if (entry != null && entry.getType() != EntryType.FUNCTION)
+			throw new RuntimeException(name + " já declarado!");
+
+		// adiciona o um marcador para função
+		if (entry == null)
+			Table.put(name, new Entry(name, EntryType.FUNCTION, null), tableKeyAccessor.peek());
+	}
+
+	@Override
+	public void exitFuncHead(FuncHeadContext ctx) {
+		// nome da função
+		String name = ctx.name.getText();
+
+		// lista de parametros
+		List<Pair<Type, String>> args = new ArrayList<>();
+		// quantidade de parametros default
+		Integer qtParamDefault = 0;
+
+		// lista os parametros e conta a quantidade de funções com parametros
+		// default
+		for (ArgContext e : ctx.arg()) {
+			String value = e.literal() != null ? e.literal().getText() : null;
+			args.add(new Pair<>(e.type().t, value));
+		}
+
+		// conjunto de informações sobre a função
+		FuncInfo info = new FuncInfo(args);
+		qtParamDefault = info.getQtParamDefault();
+
+		// para cada possível representção de função (parametros default)
+		// cria um marcador e coloca na tabela.
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i <= qtParamDefault; ++i) {
+			int j = 1;
+			builder.setLength(0);
+			builder.append('_');
+			builder.append(name);
+			int counter = 0;
+			for (Pair<Type, String> arg : args) {
+				// lida com parametros com valor default
+				if (arg.second != null) {
+					if (j > i)
+						continue;
+					else
+						++j;
+				}
+				builder.append('_');
+				builder.append(arg.first.toString().toLowerCase());
+				++counter;
+			}
+			builder.append('_');
+			builder.append(counter);
+
+			String newFuncName = builder.toString();
+			if (Table.get(newFuncName, tableKeyAccessor) != null)
+				throw new RuntimeException("Há conflitos nas definições da função " + name);
+			Table.put(newFuncName, new Entry(newFuncName, EntryType.FUNCTION, info), tableKeyAccessor.get(1));
+			System.out.println("Declaração de função:" + newFuncName);
+		}
 	}
 
 }

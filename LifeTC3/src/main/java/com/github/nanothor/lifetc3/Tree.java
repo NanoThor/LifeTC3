@@ -1,6 +1,7 @@
 package com.github.nanothor.lifetc3;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -14,7 +15,12 @@ import com.google.gson.GsonBuilder;
 
 public class Tree {
 	public static void main(String[] args) throws Exception {
-		ANTLRFileStream is = new ANTLRFileStream("Files/official input.txt");
+		ANTLRInputStream is;
+		if (args.length > 0) {
+			is = new ANTLRInputStream(System.in);
+		} else {
+			is = new ANTLRFileStream("Files/official input.txt");
+		}
 		LifeTC3GrammarLexer l = new LifeTC3GrammarLexer(is);
 		CommonTokenStream cts = new CommonTokenStream(l);
 		LifeTC3GrammarParser p = new LifeTC3GrammarParser(cts);

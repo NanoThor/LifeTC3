@@ -53,7 +53,11 @@ returns [Type t]
 // definição de função
 funcDecl
 returns [Node n]
-	: name=ID '(' (arg (',' arg)*)?')' ':' type  funcBody;
+	: funcHead  funcBody;
+
+funcHead
+    : name=ID '(' (arg (',' arg)*)?')' ':' type
+    ;
 
 // definiçao de parametro formal
 arg
@@ -187,7 +191,8 @@ factor
 returns [Node n]
 	: '(' bool ')'    # FromBoolToFactorL
 	| ID              # VarConstUseL
-	| functionCall    # FunctionCallL
+	| 
+	functionCall    # FunctionCallL
 	| literal         # LiteralL
 	;
 
