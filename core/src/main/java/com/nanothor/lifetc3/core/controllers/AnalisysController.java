@@ -6,8 +6,8 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.gui.TreeViewer;
 
-import br.ufpi.compilers.firstcompiler.antlr4.LifeTC3GrammarLexer;
-import br.ufpi.compilers.firstcompiler.antlr4.LifeTC3GrammarParser;
+import com.github.nanothor.grammar.LifeTC3GrammarLexer;
+import com.github.nanothor.grammar.LifeTC3GrammarParser;
 
 public class AnalisysController {
 	private static final boolean debug = true;
@@ -42,6 +42,8 @@ public class AnalisysController {
 		ANTLRInputStream input;
 		input = new ANTLRInputStream(text);
 		_lexer.setInputStream(input);
+		_tokens = new CommonTokenStream(_lexer);
+		_parser = new LifeTC3GrammarParser(_tokens);
 	}
 
 	public TreeViewer getCompleteParserTreeViewer() {
@@ -54,8 +56,6 @@ public class AnalisysController {
 
 	public TreeViewer getCompleteParserTreeViewer(String text) {
 		setTextInput(text);
-		_tokens = new CommonTokenStream(_lexer);
-		_parser = new LifeTC3GrammarParser(_tokens);
 		return getCompleteParserTreeViewer();
 	}
 

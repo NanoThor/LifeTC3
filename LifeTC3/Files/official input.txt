@@ -12,7 +12,7 @@ fatorial (int fat) : int {
 		return (fat * fatorial(fat - 1) );
  	}
  	
- 	while(10){
+ 	while(10 > 5){
  		print(y);
  	}
  }

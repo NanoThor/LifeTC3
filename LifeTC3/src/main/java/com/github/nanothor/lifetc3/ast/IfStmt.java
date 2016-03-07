@@ -30,7 +30,6 @@ public class IfStmt extends Node {
 	public void visit(PrintStream ps) {
 		String label0 = "iflabel"+(label++)+":";
 		
-		ps.println("IFSTMT=============");
 		condition.visit(ps);
 		ps.println("            ldc 1");
 		ps.println("            ifne "+label0);
