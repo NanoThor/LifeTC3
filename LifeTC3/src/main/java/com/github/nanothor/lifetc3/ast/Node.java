@@ -13,7 +13,7 @@ public abstract class Node {
 	protected static LinkedList<Integer> scopeAccessor;
 
 	String name;
-	protected Type type;
+	protected Type type = Type.TYPE_ERROR;
 	protected String retAddr;
 
 	static long counter = 0;
@@ -26,6 +26,10 @@ public abstract class Node {
 
 	public Type getType() {
 		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
 	}
 
 	public abstract void visit(PrintStream ps);

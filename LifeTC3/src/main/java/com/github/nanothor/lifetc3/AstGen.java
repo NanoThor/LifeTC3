@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -76,6 +77,7 @@ import com.github.nanothor.lifetc3.ast.ConstLiteralNode;
 import com.github.nanothor.lifetc3.ast.ConstNode;
 import com.github.nanothor.lifetc3.ast.ExitStmt;
 import com.github.nanothor.lifetc3.ast.ForStmt;
+import com.github.nanothor.lifetc3.ast.FuncCallNode;
 import com.github.nanothor.lifetc3.ast.FuncNode;
 import com.github.nanothor.lifetc3.ast.IfStmt;
 import com.github.nanothor.lifetc3.ast.MenusNode;
@@ -254,6 +256,14 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitConstDecl(ConstDeclContext ctx) {
+		// checar tipo;
+		if (ctx.type().t != ctx.literal().n.getType()) {
+			Token start = ctx.getStart();
+			String msg = String.format("Erro: linha %d, coluna %d; Tipos não casam em '%s'", start.getLine(),
+					start.getCharPositionInLine(), ctx.getText());
+			throw new RuntimeException(msg);
+		}
+
 		String constName = ctx.name.getText();
 		if (Table.containsKey(constName, tableKeyAccessor.peek())) {
 			throw new ParseCancellationException(constName + " já definido!");
@@ -291,8 +301,10 @@ public class AstGen implements LifeTC3GrammarListener {
 	@Override
 	public void exitArg(ArgContext ctx) {
 		String name = ctx.ID().getText();
+
 		if (Table.containsKey(name, tableKeyAccessor.peek()))
-			throw new ParseCancellationException(ctx.ID() + " já definido!");
+			erro(ctx, ctx.ID() + " já definido!");
+
 		LiteralContext literal = ctx.literal();
 		ArgInfo info;
 		if (literal != null) {
@@ -321,6 +333,7 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void enterFuncBody(FuncBodyContext ctx) {
+		System.out.println(tableKeyAccessor);
 	}
 
 	@Override
@@ -412,11 +425,47 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitFunctionCall(FunctionCallContext ctx) {
-		SeqNode seq = new SeqNode();
+		String funcName = ctx.ID().getText();
+		Entry entry = Table.get(funcName, tableKeyAccessor);
+
+		if (entry == null)
+			erro(ctx, "A função " + funcName + " não foi declarada!");
+		if (entry.getType() != EntryType.FUNCTION && entry.getType() != EntryType.BUILTIN_FUNCTION)
+			erro(ctx, funcName + " não é uma função");
+
+		FuncCallNode n = new FuncCallNode();
 		for (BoolContext av : ctx.bool()) {
-			seq.add(av.n);
+			n.add(av.n);
 		}
-		ctx.n = seq;
+
+		if (entry.getType() == EntryType.FUNCTION) {
+			StringBuilder builder = new StringBuilder();
+			builder.append('_');
+			builder.append(funcName);
+
+			n.getNodes().forEach(e -> {
+				builder.append('_');
+				builder.append(e.getType().toString().toLowerCase());
+			});
+
+			builder.append('_');
+			builder.append(n.getNodes().size());
+			String newFuncName = builder.toString();
+			Entry entry2 = Table.get(newFuncName, tableKeyAccessor);
+			if (entry2 == null)
+				erro(ctx, "A função " + funcName + " não possui declaração compativel com os parametros reais");
+
+			FuncInfo info = (FuncInfo) entry2.getInfo();
+			n.setInfo(info);
+			n.setType(info.getType());
+		}
+
+		if (entry.getType() == EntryType.BUILTIN_FUNCTION) {
+			n.setInfo(null);
+			n.setType(Type.TYPE_ERROR);
+		}
+
+		ctx.n = n;
 	}
 
 	@Override
@@ -506,6 +555,11 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitGtOperationL(GtOperationLContext ctx) {
+		Type lt = ctx.l.n.getType();
+		Type rt = ctx.r.n.getType();
+		if (lt != rt)
+			erro(ctx, "O operador '" + ctx.op.getText() + "' não é aplicável a tipos incompatíveis");
+
 		ctx.n = new BinaryOpNode(BinaryOperation.GT, ctx.l.n, ctx.r.n);
 	}
 
@@ -515,6 +569,11 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitGeOperationL(GeOperationLContext ctx) {
+		Type lt = ctx.l.n.getType();
+		Type rt = ctx.r.n.getType();
+		if (lt != rt)
+			erro(ctx, "O operador '" + ctx.op.getText() + "' não é aplicável a tipos incompatíveis");
+
 		ctx.n = new BinaryOpNode(BinaryOperation.GTE, ctx.l.n, ctx.r.n);
 	}
 
@@ -524,6 +583,11 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitLtOperationL(LtOperationLContext ctx) {
+		Type lt = ctx.l.n.getType();
+		Type rt = ctx.r.n.getType();
+		if (lt != rt)
+			erro(ctx, "O operador '" + ctx.op.getText() + "' não é aplicável a tipos incompatíveis");
+
 		ctx.n = new BinaryOpNode(BinaryOperation.LT, ctx.l.n, ctx.r.n);
 	}
 
@@ -534,6 +598,11 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitLeOperationL(LeOperationLContext ctx) {
+		Type lt = ctx.l.n.getType();
+		Type rt = ctx.r.n.getType();
+		if (lt != rt)
+			erro(ctx, "O operador '" + ctx.op.getText() + "' não é aplicável a tipos incompatíveis");
+
 		ctx.n = new BinaryOpNode(BinaryOperation.LTE, ctx.l.n, ctx.r.n);
 	}
 
@@ -554,6 +623,11 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitEqOperationL(EqOperationLContext ctx) {
+		Type lt = ctx.l.n.getType();
+		Type rt = ctx.r.n.getType();
+		if (lt != rt)
+			erro(ctx, "O operador '==' não é aplicável a tipos incompatíveis");
+
 		ctx.n = new BinaryOpNode(BinaryOperation.EQ, ctx.l.n, ctx.r.n);
 	}
 
@@ -563,6 +637,10 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitDiffOperationL(DiffOperationLContext ctx) {
+		Type lt = ctx.l.n.getType();
+		Type rt = ctx.r.n.getType();
+		if (lt != rt)
+			erro(ctx, "O operador '" + ctx.op.getText() + "' não é aplicável a tipos incompatíveis");
 		ctx.n = new BinaryOpNode(BinaryOperation.NE, ctx.l.n, ctx.r.n);
 	}
 
@@ -583,6 +661,13 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitAddOperationL(AddOperationLContext ctx) {
+		Type lt = ctx.l.n.getType();
+		Type rt = ctx.r.n.getType();
+		if (lt != rt)
+			erro(ctx, "O operador '+' não é aplicável a tipos incompatíveis");
+		if (lt != Type.INT && lt != Type.FLOAT)
+			erro(ctx, "O operador '+' não é aplicável ao tipo" + lt.toString().toLowerCase());
+
 		ctx.n = new BinaryOpNode(BinaryOperation.ADD, ctx.l.n, ctx.r.n);
 	}
 
@@ -602,6 +687,13 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitSubOperationL(SubOperationLContext ctx) {
+		Type lt = ctx.l.n.getType();
+		Type rt = ctx.r.n.getType();
+		if (lt != rt)
+			erro(ctx, "O operador '-' não é aplicável a tipos incompatíveis");
+		if (lt != Type.INT && lt != Type.FLOAT)
+			erro(ctx, "O operador '-' não é aplicável ao tipo" + lt.toString().toLowerCase());
+
 		ctx.n = new BinaryOpNode(BinaryOperation.SUB, ctx.l.n, ctx.r.n);
 	}
 
@@ -612,6 +704,12 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitDivOperationL(DivOperationLContext ctx) {
+		Type lt = ctx.l.n.getType();
+		Type rt = ctx.r.n.getType();
+		if (lt != rt)
+			erro(ctx, "O operador '/' não é aplicável a tipos incompatíveis");
+		if (lt != Type.INT && lt != Type.FLOAT)
+			erro(ctx, "O operador '/' não é aplicável ao tipo" + lt.toString().toLowerCase());
 		ctx.n = new BinaryOpNode(BinaryOperation.DIV, ctx.l.n, ctx.r.n);
 	}
 
@@ -632,6 +730,17 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitMulOperationL(MulOperationLContext ctx) {
+		Type lt = ctx.l.n.getType();
+		Type rt = ctx.r.n.getType();
+		System.out.println("^" + lt);
+		System.out.println("^" + rt);
+		System.out.println(ctx.r.n);
+		if (lt != rt)
+			erro(ctx, "O operador '*' não é aplicável a tipos incompatíveis");
+
+		if (lt != Type.INT && lt != Type.FLOAT)
+			erro(ctx, "O operador '*' não é aplicável ao tipo" + lt.toString().toLowerCase());
+
 		ctx.n = new BinaryOpNode(BinaryOperation.MUL, ctx.l.n, ctx.r.n);
 	}
 
@@ -642,7 +751,18 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitNotOperationL(NotOperationLContext ctx) {
+		if (ctx.r.n.getType() != Type.BOOLEAN) {
+			erro(ctx, "O operador '!' age somente sobre expressões booleanas");
+		}
+
 		ctx.n = new NotNode(ctx.r.n);
+	}
+
+	private void erro(ParserRuleContext ctx, String msg) {
+		Token start = ctx.getStart();
+		String msgEx = String.format("Erro: linha %d, coluna %d; %s", start.getLine(), start.getCharPositionInLine(),
+				msg);
+		throw new RuntimeException(msgEx);
 	}
 
 	@Override
@@ -652,6 +772,8 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void exitMinusOperationL(MinusOperationLContext ctx) {
+		if (ctx.r.n.getType() != Type.INT && ctx.r.n.getType() != Type.FLOAT)
+			erro(ctx, "O operador '-' não é aplicável ao tipo " + ctx.r.n.getType().toString().toLowerCase());
 		ctx.n = new MenusNode(ctx.r.n);
 	}
 
@@ -776,7 +898,7 @@ public class AstGen implements LifeTC3GrammarListener {
 
 		// adiciona o um marcador para função
 		if (entry == null)
-			Table.put(name, new Entry(name, EntryType.FUNCTION, null), tableKeyAccessor.peek());
+			Table.put(name, new Entry(name, EntryType.FUNCTION, null), tableKeyAccessor.get(1));
 	}
 
 	@Override
@@ -799,6 +921,7 @@ public class AstGen implements LifeTC3GrammarListener {
 
 		// conjunto de informações sobre a função
 		FuncInfo info = new FuncInfo(name, args);
+		info.setType(ctx.type().t);
 		qtParamDefault = info.getQtParamDefault();
 		info.setScopeAccessor(tableKeyAccessor);
 		ctx.info = info;

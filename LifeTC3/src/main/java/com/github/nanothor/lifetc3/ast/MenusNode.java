@@ -14,7 +14,7 @@ public class MenusNode extends Node {
 
 	public MenusNode(Node n) {
 		this.n = n;
-		// System.out.println(this);
+		this.type = n.getType();
 	}
 
 	public Node getN() {

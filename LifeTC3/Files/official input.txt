@@ -1,10 +1,12 @@
 class exemplo;
 var numero : int;
+int k = 12;
+
 
 fatorial (int fat) : int {
-	var k : int;
+	var y : int;
 	numero = 10;
-	k = 20;
+	y = -10.0;
 	if (fat > 1) {
 		return (fat * fatorial(fat - 1) );
  	} else {

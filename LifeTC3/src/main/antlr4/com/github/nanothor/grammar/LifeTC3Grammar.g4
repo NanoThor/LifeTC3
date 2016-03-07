@@ -193,8 +193,7 @@ factor
 returns [Node n]
 	: '(' bool ')'    # FromBoolToFactorL
 	| ID              # VarConstUseL
-	| 
-	functionCall    # FunctionCallL
+	| functionCall    # FunctionCallL
 	| literal         # LiteralL
 	;
 

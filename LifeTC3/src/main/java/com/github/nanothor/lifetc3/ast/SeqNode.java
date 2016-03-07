@@ -19,4 +19,8 @@ public class SeqNode extends Node {
 			n.visit(ps);
 		}
 	}
+
+	public List<Node> getNodes() {
+		return seq;
+	}
 }

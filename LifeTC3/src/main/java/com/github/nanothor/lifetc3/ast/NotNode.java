@@ -11,17 +11,8 @@ public class NotNode extends Node {
 	private Node n;
 
 	public NotNode(Node n) {
-		this.setN(n);
-
-		// System.out.println(this);
-	}
-
-	public Node getN() {
-		return n;
-	}
-
-	public void setN(Node n) {
 		this.n = n;
+		this.type = Type.BOOLEAN;
 	}
 
 	@Override

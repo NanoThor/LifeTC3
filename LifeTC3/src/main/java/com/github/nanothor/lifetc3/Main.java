@@ -25,9 +25,15 @@ public class Main {
 		ParseTreeWalker walker = new ParseTreeWalker();
 		AstGen astGen = new AstGen();
 		ParseTree tree = p.prog();
-		walker.walk(astGen, tree);
 
-		((ProgContext) tree).n.visit(System.out);
+		try {
+			walker.walk(astGen, tree);
+
+			((ProgContext) tree).n.visit(System.out);
+		} catch (RuntimeException e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace(System.out);
+		}
 
 		// Gson gson = new
 		// GsonBuilder().setPrettyPrinting().setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)

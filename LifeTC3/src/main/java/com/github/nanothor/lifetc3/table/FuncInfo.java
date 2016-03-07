@@ -12,6 +12,8 @@ public class FuncInfo extends Info {
 	private int qtParamDefault;
 	private String functionName;
 
+	private Type type;
+
 	private boolean emmitedCode = false;
 	private LinkedList<Integer> scopeAccessor;
 
@@ -51,5 +53,13 @@ public class FuncInfo extends Info {
 
 	public void setScopeAccessor(LinkedList<Integer> scopeAccessor) {
 		this.scopeAccessor = new LinkedList<>(scopeAccessor);
+	}
+
+	public Type getType() {
+		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
 	}
 }
