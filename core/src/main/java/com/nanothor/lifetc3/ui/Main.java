@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import javax.print.attribute.standard.MediaSize.ISO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -14,6 +15,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
@@ -21,8 +27,20 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import org.jdesktop.swingx.JXMultiSplitPane;
 import org.jdesktop.swingx.multisplitpane.DefaultSplitPaneModel;
 
+import com.github.nanothor.grammar.LifeTC3GrammarLexer;
+import com.github.nanothor.grammar.LifeTC3GrammarParser;
+import com.github.nanothor.grammar.LifeTC3GrammarParser.ProgContext;
+import com.github.nanothor.lifetc3.AstGen;
 import com.nanothor.lifetc3.core.controllers.AnalisysController;
 import com.nanothor.lifetc3.ui.utils.ANTLRTokenMaker;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+
+import javax.swing.JTextArea;
 
 public class Main {
 
@@ -32,6 +50,7 @@ public class Main {
 	private AnalisysController analisysController;
 	private TreeViewerPanel treeViewerPanel;
 	private RSyntaxTextArea textArea;
+	private JTextArea compiledCodeTextArea;
 
 	/**
 	 * Launch the application.
@@ -71,7 +90,12 @@ public class Main {
 		JPanel left_panel = new JPanel();
 		left_panel.setLayout(new BorderLayout(0, 0));
 
-		JButton btnSpace = new JButton("SPACE");
+		JButton btnSpace = new JButton("COMPILE");
+		btnSpace.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				compile();
+			}
+		});
 		left_panel.add(btnSpace);
 
 		JPanel center_panel = new JPanel();
@@ -101,8 +125,14 @@ public class Main {
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		lower_content_panel.add(tabbedPane, BorderLayout.CENTER);
 
-		JPanel console_panel = new JPanel();
-		tabbedPane.addTab("Console", null, console_panel, null);
+		JPanel code_panel = new JPanel();
+		tabbedPane.addTab("Console", null, code_panel, null);
+		code_panel.setLayout(new BorderLayout(0, 0));
+		
+		compiledCodeTextArea = new JTextArea();
+		JScrollPane codeScrollPane = new JScrollPane(compiledCodeTextArea);
+		code_panel.add(codeScrollPane);
+		
 
 		JPanel erros_panel = new JPanel();
 		tabbedPane.addTab("Errors", null, erros_panel, null);
@@ -165,4 +195,32 @@ public class Main {
 		}
 	}
 
+	private void compile(){
+		
+		AnalisysController analisysController = AnalisysController.getInstance();
+		analisysController.setTextInput(textArea.getText());
+		ParseTreeWalker walker = new ParseTreeWalker();
+		AstGen astGen = new AstGen();
+		ParseTree tree = analisysController.getParser().prog();
+
+		try {
+			walker.walk(astGen, tree);
+			
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			PrintStream ps = new PrintStream(baos);
+			
+			((ProgContext) tree).n.visit(ps);
+			
+			String code = baos.toString("UTF8");
+			
+			compiledCodeTextArea.setText(code);
+			
+			System.out.println(code);
+			
+		} catch (RuntimeException | UnsupportedEncodingException e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace(System.out);
+		}
+	}
+	
 }
