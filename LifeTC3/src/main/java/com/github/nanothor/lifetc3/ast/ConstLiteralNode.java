@@ -34,6 +34,6 @@ public class ConstLiteralNode extends Node {
 
 	@Override
 	public void visit(PrintStream ps) {
-		ps.println("ldc "+ value);
+		ps.println("            ldc "+ value);
 	}
 }

@@ -56,20 +56,51 @@ public class BinaryOpNode extends Node {
 		
 		switch (op) {
 		case ADD:
-			ps.println(getTypedOperation("add", left.getType()));
+			ps.println("            "+getTypedOperation("add", left.getType()));
 			break;
 		case SUB:
-			ps.println(getTypedOperation("sub", left.getType()));
+			ps.println("            "+getTypedOperation("sub", left.getType()));
 			break;
 		case MUL:
-			ps.println(getTypedOperation("mul", left.getType()));
+			ps.println("            "+getTypedOperation("mul", left.getType()));
 			break;
 		case DIV:
-			ps.println(getTypedOperation("div", left.getType()));
+			ps.println("            "+getTypedOperation("div", left.getType()));
+			break;
+		case EQ:
+			ps.print(printComparisonTemplate("ifeq"));
+			break;
+		case GT:
+			ps.print(printComparisonTemplate("ifgt"));
+			break;
+		case GTE:
+			ps.print(printComparisonTemplate("ifgte"));
+			break;
+		case LT:
+			ps.print(printComparisonTemplate("iflt"));
+			break;
+		case LTE:
+			ps.print(printComparisonTemplate("iflte"));
 			break;
 		default:
 			throw new RuntimeException("Erro Interno. Operação não reconhecida.");
 		}
+	}
+
+	private String printComparisonTemplate(String instruction) {
+		String label1 = "condlabel"+(labelCounter++);
+		String label2 = "condlabel"+(labelCounter++);
+		
+		String code = ""; 
+		
+		code += "            "+instruction+" "+label1+"\n";
+		code += "            ldc 0"+"\n";
+		code += "            goto "+label2+"\n";
+		code += label1+":"+"\n";
+		code += "            ldc 1"+"\n";
+		code += label2+":"+"\n";
+		
+		return code;
 	}
 	
 	public String getTypedOperation(String sufix, Type type){
