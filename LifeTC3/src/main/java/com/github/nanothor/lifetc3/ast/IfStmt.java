@@ -11,6 +11,8 @@ public class IfStmt extends Node {
 	// para o else
 	private Node elze;
 
+	private static long label;
+	
 	public IfStmt(Node condition, Node then, Node elze) {
 		this.condition = condition;
 		this.then = then;
@@ -26,19 +28,17 @@ public class IfStmt extends Node {
 
 	@Override
 	public void visit(PrintStream ps) {
-		System.out.println("TODO IF");
-		switch (condition.type) {
-		case STRING:
-			System.out.println("Fazer condição quando for String");
-			break;
-		case BOOLEAN:
-		case INT:
-			break;
-
-		case FLOAT:
-			break;
-		default:
-			break;
-		}
+		String label0 = "iflabel"+(label++)+":";
+		
+		ps.println("IFSTMT=============");
+		condition.visit(ps);
+		ps.println("            ldc 1");
+		ps.println("            ifne "+label0);
+		then.visit(ps);
+		ps.println(label0);
+		if(elze!=null)
+			elze.visit(ps);
+		
+		
 	}
 }
