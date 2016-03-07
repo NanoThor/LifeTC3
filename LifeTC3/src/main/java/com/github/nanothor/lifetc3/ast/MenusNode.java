@@ -33,7 +33,8 @@ public class MenusNode extends Node {
 	@Override
 	public void visit(PrintStream ps) {
 		n.visit(ps);
-		ps.println("; Minus Unary");
+		if (debug)
+			ps.println("; Minus Unary");
 		switch (n.type) {
 		case INT:
 			ps.println("            ineg");

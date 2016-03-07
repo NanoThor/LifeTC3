@@ -11,6 +11,7 @@ import java.util.LinkedList;
 // no generico da ast
 public abstract class Node {
 	protected static LinkedList<Integer> scopeAccessor;
+	protected static final boolean debug = true;
 
 	String name;
 	protected Type type = Type.TYPE_ERROR;

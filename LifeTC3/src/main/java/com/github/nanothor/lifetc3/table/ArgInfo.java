@@ -40,4 +40,5 @@ public class ArgInfo extends Info {
 	public int getAddress() {
 		return address;
 	}
+
 }

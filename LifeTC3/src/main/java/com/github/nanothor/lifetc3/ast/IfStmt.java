@@ -12,7 +12,7 @@ public class IfStmt extends Node {
 	private Node elze;
 
 	private static long label;
-	
+
 	public IfStmt(Node condition, Node then, Node elze) {
 		this.condition = condition;
 		this.then = then;
@@ -28,16 +28,38 @@ public class IfStmt extends Node {
 
 	@Override
 	public void visit(PrintStream ps) {
-		String label0 = "iflabel"+(label++)+":";
-		
+		String label1 = "iflabel" + (label++);
+		String label2 = "iflabel" + (label++);
+
 		condition.visit(ps);
-		ps.println("            ldc 1");
-		ps.println("            ifne "+label0);
+
+		if (debug)
+			ps.println("; If Stmt");
+
+		switch (condition.getType()) {
+		case FLOAT:
+			ps.println("            f2i ");
+		case BOOLEAN:
+		case INT:
+			ps.println("            ifeq " + label1);
+			break;
+		case STRING:
+			ps.println("            ldc \"\"");
+			ps.println("            if_acmpeq " + label1);
+			break;
+		default:
+			throw new RuntimeException("Erro Interno!");
+		}
+
 		then.visit(ps);
-		ps.println(label0);
-		if(elze!=null)
+
+		if (elze != null) {
+			ps.println("            goto " + label2);
+			ps.println(label1);
 			elze.visit(ps);
-		
-		
+			ps.println(label2);
+		} else {
+			ps.println(label1);
+		}
 	}
 }

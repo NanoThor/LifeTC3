@@ -24,6 +24,9 @@ public class FuncNode extends SeqNode {
 
 	@Override
 	public void visit(PrintStream ps) {
+		if (info.isEmmitedCode())
+			return;
+
 		int counter = 0;
 		// gerar os endereços das variáveis;
 		for (String e : info.getArgNames()) {

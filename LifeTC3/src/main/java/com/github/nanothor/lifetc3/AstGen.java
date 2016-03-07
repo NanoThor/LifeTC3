@@ -319,17 +319,20 @@ public class AstGen implements LifeTC3GrammarListener {
 	@Override
 	public void enterMainFunction(MainFunctionContext ctx) {
 		tableKeyAccessor.push(Table.newId());
+		scope.push(Scope.LOCAL);
 	}
 
 	@Override
 	public void exitMainFunction(MainFunctionContext ctx) {
-		tableKeyAccessor.pop();
 		ctx.n = ctx.funcBody().n;
 
 		FuncInfo info = new FuncInfo("main", new ArrayList<>());
 		info.setType(Type.TYPE_ERROR);
 		info.setScopeAccessor(tableKeyAccessor);
 		((FuncNode) ctx.n).setInfo(info);
+
+		scope.pop();
+		tableKeyAccessor.pop();
 	}
 
 	@Override

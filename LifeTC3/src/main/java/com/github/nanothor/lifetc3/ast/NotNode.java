@@ -22,7 +22,8 @@ public class NotNode extends Node {
 
 	@Override
 	public void visit(PrintStream ps) {
-		ps.println("; Not");
+		if (debug)
+			ps.println("; Not");
 		ps.print("            ldc 1");
 		ps.print("            ixor");
 
