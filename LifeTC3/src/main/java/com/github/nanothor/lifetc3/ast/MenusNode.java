@@ -32,6 +32,17 @@ public class MenusNode extends Node {
 
 	@Override
 	public void visit(PrintStream ps) {
-		ps.println("TODO");
+		n.visit(ps);
+		ps.println("; Minus Unary");
+		switch (n.type) {
+		case INT:
+			ps.println("            ineg");
+			break;
+		case FLOAT:
+			ps.println("            fneg");
+			break;
+		default:
+			throw new RuntimeException("Erro Interno!");
+		}
 	}
 }

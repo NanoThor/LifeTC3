@@ -6,7 +6,8 @@ int k = 12;
 fatorial (int fat) : int {
 	var y : int;
 	numero = 10;
-	y = -10.0;
+	y = -k;
+	
 	if (fat > 1) {
 		return (fat * fatorial(fat - 1) );
  	}
