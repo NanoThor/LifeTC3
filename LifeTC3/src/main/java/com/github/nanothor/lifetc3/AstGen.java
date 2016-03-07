@@ -98,7 +98,6 @@ import com.github.nanothor.lifetc3.table.FuncInfo;
 import com.github.nanothor.lifetc3.table.Scope;
 import com.github.nanothor.lifetc3.table.Table;
 import com.github.nanothor.lifetc3.table.VarInfo;
-import com.github.nanothor.lifetc3.util.Pair;
 
 public class AstGen implements LifeTC3GrammarListener {
 	private boolean debug = false;
@@ -328,6 +327,7 @@ public class AstGen implements LifeTC3GrammarListener {
 		ctx.n = ctx.funcBody().n;
 
 		FuncInfo info = new FuncInfo("main", new ArrayList<>());
+		info.setType(Type.TYPE_ERROR);
 		info.setScopeAccessor(tableKeyAccessor);
 		((FuncNode) ctx.n).setInfo(info);
 	}
@@ -904,8 +904,8 @@ public class AstGen implements LifeTC3GrammarListener {
 		// nome da função
 		String name = ctx.name.getText();
 
-		// lista de parametros
-		List<Pair<Type, String>> args = new ArrayList<>();
+		// lista de nomes dos parametros
+		List<String> args = new ArrayList<>();
 
 		// quantidade de parametros default
 		Integer qtParamDefault = 0;
@@ -913,15 +913,14 @@ public class AstGen implements LifeTC3GrammarListener {
 		// lista os parametros e conta a quantidade de funções com parametros
 		// default
 		for (ArgContext e : ctx.arg()) {
-			String value = e.literal() != null ? e.literal().getText() : null;
-			args.add(new Pair<>(e.type().t, value));
+			args.add(e.ID().getText());
 		}
 
 		// conjunto de informações sobre a função
 		FuncInfo info = new FuncInfo(name, args);
 		info.setType(ctx.type().t);
-		qtParamDefault = info.getQtParamDefault();
 		info.setScopeAccessor(tableKeyAccessor);
+		qtParamDefault = info.getQtParamDefault();
 		ctx.info = info;
 
 		// para cada possível representção de função (parametros default)
@@ -933,16 +932,18 @@ public class AstGen implements LifeTC3GrammarListener {
 			builder.append('_');
 			builder.append(name);
 			int counter = 0;
-			for (Pair<Type, String> arg : args) {
-				// lida com parametros com valor default
-				if (arg.second != null) {
-					if (j > i)
-						continue;
-					else
-						++j;
-				}
+			for (String argName : args) {
+				Entry entry = Table.get(argName, tableKeyAccessor.peek());
+				ArgInfo argInfo = (ArgInfo) entry.getInfo();
+				if (argInfo.getDefaultValue() != null)
+					if (argInfo.getDefaultValue() != null) {
+						if (j > i)
+							continue;
+						else
+							++j;
+					}
 				builder.append('_');
-				builder.append(arg.first.toString().toLowerCase());
+				builder.append(argInfo.getType().toString().toLowerCase());
 				++counter;
 			}
 			builder.append('_');

@@ -3,8 +3,10 @@ package com.github.nanothor.lifetc3.ast;
 import java.io.PrintStream;
 import java.util.LinkedList;
 
+import com.github.nanothor.lifetc3.table.ArgInfo;
+import com.github.nanothor.lifetc3.table.Entry;
 import com.github.nanothor.lifetc3.table.FuncInfo;
-import com.github.nanothor.lifetc3.util.Pair;
+import com.github.nanothor.lifetc3.table.Table;
 
 //no da ast para implementação de função
 public class FuncNode extends SeqNode {
@@ -20,33 +22,32 @@ public class FuncNode extends SeqNode {
 
 	@Override
 	public void visit(PrintStream ps) {
-
-		int counter = 0;
-
 		// para gerar o nome;
 		StringBuilder builder = new StringBuilder();
 		builder.setLength(0);
 		builder.append('_');
 		builder.append(info.getFunctionName());
 
-		info.getArgs().forEach(e -> {
+		for (String e : info.getArgNames()) {
+			Entry entry = Table.get(e, info.getScopeAccessor().peek());
 			builder.append('_');
-			builder.append(e.first.toString().toLowerCase());
-		});
+			builder.append(((ArgInfo) entry.getInfo()).getType().toString().toLowerCase());
+		}
 
 		builder.append('_');
-		builder.append(info.getArgs().size());
+		builder.append(info.getArgNames().size());
 		String funcName = builder.toString();
 
 		// para gerar o descritor
 		builder.setLength(0);
-		for (Pair<Type, String> e : info.getArgs()) {
-			String ret = convertTypeToDesc(e.first);
+		for (String e : info.getArgNames()) {
+			Entry entry = Table.get(e, info.getScopeAccessor().peek());
+			String ret = convertTypeToDesc(((ArgInfo) entry.getInfo()).getType());
 			builder.append(ret);
 		}
 
 		String desc = builder.toString();
-		String ret = convertTypeToDesc(type);
+		String ret = convertTypeToDesc(info.getType());
 
 		ps.println();
 		ps.println(".method public " + funcName + "(" + desc + ")" + ret);

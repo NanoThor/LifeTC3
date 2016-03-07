@@ -4,12 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.github.nanothor.lifetc3.ast.Type;
-import com.github.nanothor.lifetc3.util.Pair;
 
 // informações sobre constantes
 public class FuncInfo extends Info {
-	private List<Pair<Type, String>> args;
-	private int qtParamDefault;
+	private List<String> argNames;
 	private String functionName;
 
 	private Type type;
@@ -17,26 +15,13 @@ public class FuncInfo extends Info {
 	private boolean emmitedCode = false;
 	private LinkedList<Integer> scopeAccessor;
 
-	public FuncInfo(String functionName, List<Pair<Type, String>> args) {
+	public FuncInfo(String functionName, List<String> argNames) {
 		this.functionName = functionName;
-		this.args = args;
-		this.qtParamDefault = 0;
-		for (Pair<Type, String> pair : args) {
-			if (pair.second != null)
-				++qtParamDefault;
-		}
-	}
-
-	public int getQtParamDefault() {
-		return qtParamDefault;
+		this.argNames = argNames;
 	}
 
 	public String getFunctionName() {
 		return functionName;
-	}
-
-	public List<Pair<Type, String>> getArgs() {
-		return args;
 	}
 
 	public void setEmmitedCode(boolean emmited) {
@@ -61,5 +46,24 @@ public class FuncInfo extends Info {
 
 	public void setType(Type type) {
 		this.type = type;
+	}
+
+	public int getQtParamDefault() {
+		if (scopeAccessor == null)
+			throw new RuntimeException("Deve-se Setar ScopeAccessor antes de se chamar este metodo.");
+
+		int qtParamDefault = 0;
+
+		for (String argName : argNames) {
+			Entry entry = Table.get(argName, scopeAccessor.peek());
+			if (((ArgInfo) entry.getInfo()).getDefaultValue() != null)
+				++qtParamDefault;
+		}
+
+		return qtParamDefault;
+	}
+
+	public List<String> getArgNames() {
+		return argNames;
 	}
 }

@@ -27,4 +27,8 @@ public class ArgInfo extends Info {
 	public Scope getScope() {
 		return scope;
 	}
+
+	public String getDefaultValue() {
+		return defaultValue;
+	}
 }
