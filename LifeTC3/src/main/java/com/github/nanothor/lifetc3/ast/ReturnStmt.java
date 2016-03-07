@@ -20,6 +20,21 @@ public class ReturnStmt extends Node {
 
 	@Override
 	public void visit(PrintStream ps) {
-		ps.println("TODO");
+		ret.visit(ps);
+		switch (ret.type) {
+		case INT:
+		case BOOLEAN:
+			ps.println("            ireturn");
+			break;
+		case FLOAT:
+			ps.println("            freturn");
+			break;
+		case STRING:
+			ps.println("            areturn");
+			break;
+		default:
+			ps.println("            return");
+			break;
+		}
 	}
 }
