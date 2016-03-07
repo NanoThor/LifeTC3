@@ -12,6 +12,10 @@ fatorial (int fat) : int {
  	} else {
 		return (1);
  	}
+ 	
+ 	while(10){
+ 		print(y);
+ 	}
  }
  
 resultado (int valor) : boolean {

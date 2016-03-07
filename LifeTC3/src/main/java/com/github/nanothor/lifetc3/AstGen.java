@@ -122,7 +122,8 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void visitErrorNode(ErrorNode node) {
-		System.out.println(node);
+		if (debug)
+			System.out.println(node);
 	}
 
 	@Override
@@ -333,7 +334,8 @@ public class AstGen implements LifeTC3GrammarListener {
 
 	@Override
 	public void enterFuncBody(FuncBodyContext ctx) {
-		System.out.println(tableKeyAccessor);
+		if (debug)
+			System.out.println(tableKeyAccessor);
 	}
 
 	@Override
@@ -732,9 +734,6 @@ public class AstGen implements LifeTC3GrammarListener {
 	public void exitMulOperationL(MulOperationLContext ctx) {
 		Type lt = ctx.l.n.getType();
 		Type rt = ctx.r.n.getType();
-		System.out.println("^" + lt);
-		System.out.println("^" + rt);
-		System.out.println(ctx.r.n);
 		if (lt != rt)
 			erro(ctx, "O operador '*' não é aplicável a tipos incompatíveis");
 
@@ -954,7 +953,7 @@ public class AstGen implements LifeTC3GrammarListener {
 			if (Table.get(newFuncName, tableKeyAccessor) != null)
 				throw new RuntimeException("Há conflitos nas definições da função " + name);
 			Table.put(newFuncName, new Entry(newFuncName, EntryType.FUNCTION, info), tableKeyAccessor.get(1));
-			System.out.println("Declaração de função:" + newFuncName);
+			// System.out.println("Declaração de função:" + newFuncName);
 		}
 	}
 

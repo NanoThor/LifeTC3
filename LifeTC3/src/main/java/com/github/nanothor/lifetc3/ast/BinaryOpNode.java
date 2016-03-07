@@ -15,9 +15,13 @@ public class BinaryOpNode extends Node {
 	private static long labelCounter = 0;
 
 	public BinaryOpNode(BinaryOperation op, Node left, Node right) {
+		if (left.type != right.type)
+			throw new RuntimeException("Tipos incompatíveis");
+
 		this.op = op;
 		this.left = left;
 		this.right = right;
+		type = left.getType();
 	}
 
 	public BinaryOperation getOp() {
@@ -53,19 +57,19 @@ public class BinaryOpNode extends Node {
 	public void visit(PrintStream ps) {
 		left.visit(ps);
 		right.visit(ps);
-		
+
 		switch (op) {
 		case ADD:
-			ps.println("            "+getTypedOperation("add", left.getType()));
+			ps.println("            " + getTypedOperation("add", left.getType()));
 			break;
 		case SUB:
-			ps.println("            "+getTypedOperation("sub", left.getType()));
+			ps.println("            " + getTypedOperation("sub", left.getType()));
 			break;
 		case MUL:
-			ps.println("            "+getTypedOperation("mul", left.getType()));
+			ps.println("            " + getTypedOperation("mul", left.getType()));
 			break;
 		case DIV:
-			ps.println("            "+getTypedOperation("div", left.getType()));
+			ps.println("            " + getTypedOperation("div", left.getType()));
 			break;
 		case EQ:
 			ps.print(printComparisonTemplate("ifeq"));
@@ -88,25 +92,25 @@ public class BinaryOpNode extends Node {
 	}
 
 	private String printComparisonTemplate(String instruction) {
-		String label1 = "condlabel"+(labelCounter++);
-		String label2 = "condlabel"+(labelCounter++);
-		
-		String code = ""; 
-		
-		code += "            "+instruction+" "+label1+"\n";
-		code += "            ldc 0"+"\n";
-		code += "            goto "+label2+"\n";
-		code += label1+":"+"\n";
-		code += "            ldc 1"+"\n";
-		code += label2+":"+"\n";
-		
+		String label1 = "condlabel" + (labelCounter++);
+		String label2 = "condlabel" + (labelCounter++);
+
+		String code = "";
+
+		code += "            " + instruction + " " + label1 + "\n";
+		code += "            ldc 0" + "\n";
+		code += "            goto " + label2 + "\n";
+		code += label1 + ":" + "\n";
+		code += "            ldc 1" + "\n";
+		code += label2 + ":" + "\n";
+
 		return code;
 	}
-	
-	public String getTypedOperation(String sufix, Type type){
+
+	public String getTypedOperation(String sufix, Type type) {
 		switch (type) {
 		case INT:
-			return "i" + sufix;  
+			return "i" + sufix;
 		case FLOAT:
 			return "f" + sufix;
 		default:
