@@ -48,4 +48,8 @@ public class Table {
 	public static boolean containsKey(String key, Integer id) {
 		return tables.get(id).containsKey(key);
 	}
+
+	public static Map<String, Entry> getTable(Integer id) {
+		return tables.get(id);
+	}
 }

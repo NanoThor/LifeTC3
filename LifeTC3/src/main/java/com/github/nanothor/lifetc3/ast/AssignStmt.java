@@ -23,6 +23,7 @@ public class AssignStmt extends Node {
 
 		val.visit(ps);
 
+		ps.println("; Assignment");
 		switch (varInfo.getScope()) {
 		case LOCAL:
 			emmitForLocalVar(ps, varInfo);
@@ -53,7 +54,6 @@ public class AssignStmt extends Node {
 	}
 
 	private void emmitForLocalVar(PrintStream ps, VarInfo varInfo) {
-		ps.println("; visitar variável");
 		switch (varInfo.getType()) {
 		case BOOLEAN:
 		case INT:

@@ -13,6 +13,7 @@ public class ArgInfo extends Info {
 	private Type type;
 	private Scope scope;
 	private String defaultValue;
+	private int address;
 
 	public ArgInfo(Type type, Scope scope, String defaultValue) {
 		this.type = type;
@@ -30,5 +31,13 @@ public class ArgInfo extends Info {
 
 	public String getDefaultValue() {
 		return defaultValue;
+	}
+
+	public void setAddress(int address) {
+		this.address = address;
+	}
+
+	public int getAddress() {
+		return address;
 	}
 }

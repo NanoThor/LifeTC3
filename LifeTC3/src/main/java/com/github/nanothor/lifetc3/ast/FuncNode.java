@@ -5,8 +5,10 @@ import java.util.LinkedList;
 
 import com.github.nanothor.lifetc3.table.ArgInfo;
 import com.github.nanothor.lifetc3.table.Entry;
+import com.github.nanothor.lifetc3.table.Entry.EntryType;
 import com.github.nanothor.lifetc3.table.FuncInfo;
 import com.github.nanothor.lifetc3.table.Table;
+import com.github.nanothor.lifetc3.table.VarInfo;
 
 //no da ast para implementação de função
 public class FuncNode extends SeqNode {
@@ -22,6 +24,19 @@ public class FuncNode extends SeqNode {
 
 	@Override
 	public void visit(PrintStream ps) {
+		int counter = 0;
+		// gerar os endereços das variáveis;
+		for (String e : info.getArgNames()) {
+			Entry entry = Table.get(e, info.getScopeAccessor().peek());
+			((ArgInfo) entry.getInfo()).setAddress(counter++);
+		}
+
+		for (Entry entry : Table.getTable(info.getScopeAccessor().peek()).values()) {
+			if (entry.getType() == EntryType.VAR) {
+				((VarInfo) entry.getInfo()).setAddress(counter++);
+			}
+		}
+
 		// para gerar o nome;
 		StringBuilder builder = new StringBuilder();
 		builder.setLength(0);

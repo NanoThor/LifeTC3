@@ -17,4 +17,8 @@ public class ClassInfo extends Info {
 	public void setScopeAccessor(LinkedList<Integer> scopeAccessor) {
 		this.scopeAccessor = new LinkedList<>(scopeAccessor);
 	}
+
+	public String getClassName() {
+		return className;
+	}
 }

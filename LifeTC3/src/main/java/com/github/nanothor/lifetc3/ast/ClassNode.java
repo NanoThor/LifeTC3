@@ -10,9 +10,11 @@ public class ClassNode extends SeqNode {
 
 	@Override
 	public void visit(PrintStream ps) {
-		System.out.println("Fazer o pre e o pos da classe");
+		ps.println(".class public _" + classInfo.getClassName());
+		// ps.println(".super ");
 		scopeAccessor = classInfo.getScopeAccessor();
 		super.visit(ps);
+
 	}
 
 	public ClassInfo getClassInfo() {
