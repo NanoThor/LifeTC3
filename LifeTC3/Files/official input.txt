@@ -9,8 +9,6 @@ fatorial (int fat) : int {
 	y = -10.0;
 	if (fat > 1) {
 		return (fat * fatorial(fat - 1) );
- 	} else {
-		return (1);
  	}
  	
  	while(10){

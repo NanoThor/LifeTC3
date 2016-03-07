@@ -9,22 +9,29 @@ public class WhileStmt extends Node {
 	private Node cmds;
 
 	private static long labels = 0;
-	
+
 	public WhileStmt(Node cond, Node cmds) {
 		this.cond = cond;
+		this.cmds = cmds;
 	}
 
 	@Override
 	public void visit(PrintStream ps) {
-		String label0 = "whilelabel"+(labels++)+":";
-		String label1= "whilelabel"+(labels++)+":";
-		
+		String label0 = "whilelabel" + (labels++) + ":";
+		String label1 = "whilelabel" + (labels++) + ":";
+
 		ps.println(label0);
 		cond.visit(ps);
 		ps.println("            ldc 1");
-		ps.println("            ifne "+label1);
+		ps.println("            ifne " + label1);
 		cmds.visit(ps);
-		ps.println("            goto "+label0);
+		ps.println("            goto " + label0);
 		ps.println(label1);
 	}
+
+	@Override
+	public String toString() {
+		return "WhileStmt [cond=" + cond + ", cmds=" + cmds + "]";
+	}
+
 }
