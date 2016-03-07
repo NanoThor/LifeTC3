@@ -488,7 +488,7 @@ public class AstGen implements LifeTC3GrammarListener {
 	public void exitIfStmt(IfStmtContext ctx) {
 		Node condition = ctx.c.n;
 		Node then = ctx.t.n;
-		Node elze = ctx.e.n;
+		Node elze = ctx.e != null ? ctx.e.n : null;
 		ctx.n = new IfStmt(condition, then, elze);
 	}
 
